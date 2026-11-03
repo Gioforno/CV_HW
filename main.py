@@ -4,19 +4,21 @@ from tabulate import tabulate
 from skimage.metrics import structural_similarity as compare_ssim
 
 #TODO
+# choose only 4 img (more particular for each case)
+# test other enhancement to anaylise which is better in different case
 # degradate original image OK
 #
-# enhancement respect to degradated (same param for all photo --> single function) 
-#   original photo
-#   linear contrast stretiching
-#   histogram equalization
+# enhancement respect to degradated (same param for all photo --> single function)  OK
+#   original photo OK
+#   linear contrast stretiching OK
+#   histogram equalization OK
 #   gamma correction/simplified homomorphic filter/classical denoising/combo of methods
 #
 # evaluation parameters
 #   PSNR in respect to original OK
-#   SSIM or manually implemented (for example, mean absolute error or mean squared error)
+#   SSIM or manually implemented (for example, mean absolute error or mean squared error) OK
 #
-# compare different methods on at least two images
+# compare different methods on at least two images OK
 #
 # table of comparison
 #   fix representation OK
