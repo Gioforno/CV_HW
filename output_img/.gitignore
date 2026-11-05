@@ -1,0 +1,3 @@
+#all output img will be ignored and empty dir will be uplad to github
+*
+!.gitignore
