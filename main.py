@@ -194,7 +194,7 @@ for i in range (1,5):
     visualizeCombos(o_img,d_img,ehn_img,i)
 
     PSNRTableSing = fillTableSing(PSNR_lsc[i-1], PSNR_he[i-1], PSNR_g[i-1],SSIM_lsc[i-1], SSIM_he[i-1], SSIM_g[i-1],i)
-    print("\n\n METRICS TABLE OF " +str(i)+" IMAGE")
+    print("\n\n METRICS TABLE OF photo_" +str(i))
     print(PSNRTableSing)
 
 
