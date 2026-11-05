@@ -43,7 +43,7 @@ def degradate(img):
 def fillTable(value_lsc, value_he, value_g):
     data = [[],[],[],[]]
     for i in range(0,4):
-        data[i] = ["image " + str(i+1), value_lsc[i],value_he[i] ,value_g[i]]
+        data[i] = ["photo_" + str(i), value_lsc[i],value_he[i] ,value_g[i]]
     headers = ["original image","linear contrast stretching","histogram equalization", "denoising + gamma correction"]
     table = tabulate(data, headers, tablefmt="grid")
     return table
@@ -123,7 +123,7 @@ def visualizeCombos(img1, img2, arr_img_ehn, i):
     ehn_method = ["linear contrast stretching","histogram equalization","denosing + gamma correction"]
 
     for j in range(0,3):
-        name = "visual analysis of " + str(i) + " image with " + ehn_method[j] + " method"
+        name = "visual analysis of photo_" + str(i) + " with " + ehn_method[j] + " method"
         vis = np.concatenate(
                 (    
                 cv2.resize(img1, None, fx=rescale, fy=rescale, interpolation=cv2.INTER_AREA),  #original
@@ -217,8 +217,3 @@ print("\n\nSSIM TABLE: 1 high similarity, 0 no similarity, negative means two di
 SSIMTable = fillTable(SSIM_lsc, SSIM_he, SSIM_g)
 print(SSIMTable)
 
-
-
-
-cv2.waitKey(0) #wait for any key to close windows
-cv2.destroyAllWindows() #destroy all the windows at the end of the program for have a safe memory
