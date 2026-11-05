@@ -5,14 +5,13 @@ from skimage.metrics import structural_similarity as compare_ssim
 
 #TODO
 # choose only 4 img (more particular for each case)
-# test other enhancement to anaylise which is better in different case
 # degradate original image OK
 #
 # enhancement respect to degradated (same param for all photo --> single function)  OK
 #   original photo OK
 #   linear contrast stretiching OK
 #   histogram equalization OK
-#   gamma correction/simplified homomorphic filter/classical denoising/combo of methods
+#   gamma correction + classical denoising OK
 #
 # evaluation parameters
 #   PSNR in respect to original OK
@@ -22,27 +21,39 @@ from skimage.metrics import structural_similarity as compare_ssim
 #
 # table of comparison
 #   fix representation OK
-#
+# 
+# representation: 
+#   if have time, represent better with mathplotlib instead cv2.imshow
+
 # docs
 
 
 def degradate(img):
-    alpha = 0.5 # [1.0;3.0]
-    beta = 20 # [0;100]
+    alpha = 0.7
+    beta = 30
     mean = 0
-    stddev = 180
-    noise = np.zeros(o_img.shape, np.uint8)
+    stddev = 50 
+    noise = np.zeros(img.shape, np.uint8)
     cv2.randn(noise, mean, stddev)
-    noisy_img = cv2.add(o_img, noise)
-    new_img = cv2.convertScaleAbs(noisy_img, alpha=alpha, beta=beta)
+    new_img = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
+    noisy_img = cv2.add(new_img, noise)
     
-    return new_img
+    return noisy_img
 
-def fillTable(value_o, value_lsc, value_he, value_lsc_he):
+def fillTable(value_lsc, value_he, value_g):
     data = [[],[],[],[]]
     for i in range(0,4):
-        data[i] = ["image " + str(i+1),value_o[i], value_lsc[i],value_he[i] ,value_lsc_he[i]]
-    headers = ["degradated image","original","linear contrast stretching","histogram equalization", "linear contrast stretching + histogram equalization"]
+        data[i] = ["image " + str(i+1), value_lsc[i],value_he[i] ,value_g[i]]
+    headers = ["original image","linear contrast stretching","histogram equalization", "denoising + gamma correction"]
+    table = tabulate(data, headers, tablefmt="grid")
+    return table
+
+def fillTableSing(PSNR_lsc, PSNR_he, PSNR_g,SSIM_lsc, SSIM_he, SSIM_g,i):
+    data = [
+        ["PSNR", PSNR_lsc,PSNR_he,PSNR_g],
+        ["SSIM", SSIM_lsc,SSIM_he,SSIM_g]
+        ]
+    headers = ["METRICS","linear contrast stretching","histogram equalization", "denoising + gamma correction"]
     table = tabulate(data, headers, tablefmt="grid")
     return table
 
@@ -95,7 +106,36 @@ def histEq(img):
     he_bgr = cv2.cvtColor(he_lab, cv2.COLOR_LAB2BGR)
 
     return he_bgr
+
+def gammaCorr(img):
+    ## [changing-contrast-brightness-gamma-correction]
+    gamma = 0.25
+    lookUpTable = np.empty((1,256), np.uint8)
+    for i in range(256):
+        lookUpTable[0,i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
+
+    res = cv2.LUT(img, lookUpTable)
+
+    return res
+
+def visualizeCombos(img1, img2, arr_img_ehn, i):
+    rescale = 0.4 if (i == 1 or i == 2) else 0.14 #for better visualization, not affect metrics
+    ehn_method = ["linear contrast stretching","histogram equalization","denosing + gamma correction"]
+
+    for j in range(0,3):
+        name = "visual analysis of " + str(i) + " image with " + ehn_method[j] + " method"
+        vis = np.concatenate(
+                (    
+                cv2.resize(img1, None, fx=rescale, fy=rescale, interpolation=cv2.INTER_AREA),  #original
+                cv2.resize(img2, None, fx=rescale, fy=rescale, interpolation=cv2.INTER_AREA),  #degradated
+                cv2.resize(arr_img_ehn[j], None, fx=rescale, fy=rescale, interpolation=cv2.INTER_AREA),  #enhanced
+                ),
+                axis=1)
+        
+        cv2.imshow(name, vis)
     
+    
+
 
 #default init
 # all data referred to degradated image vs
@@ -103,62 +143,78 @@ def histEq(img):
 #                                           lsc: linear contrast stretching
 
 
-PSNR_o = [0,0,0,0]
-SSIM_o = [0,0,0,0]
+PSNR_do = [0,0,0,0]
+SSIM_do = [0,0,0,0]
+
 PSNR_lsc = [0,0,0,0]
 SSIM_lsc = [0,0,0,0]
 PSNR_he = [0,0,0,0]
 SSIM_he = [0,0,0,0]
-PSNR_lsc_he = [0,0,0,0]
-SSIM_lsc_he = [0,0,0,0]
+PSNR_g = [0,0,0,0]
+SSIM_g = [0,0,0,0]
+
 
 #CYCLE ON 4 IMAGE
 for i in range (1,5):
 
     #load img and rescale to standard size
-    path = "original_images/images/photo_" + str(i) + ".jpg"
-    o_img = cv2.resize(cv2.imread(path), None, fx=0.15, fy=0.15, interpolation=cv2.INTER_AREA) 
+    path = "original_images/photo_" + str(i) + ".jpg"
+    o_img = cv2.imread(path)
 
 #DEGRADATION
     #degradate img reduncing contrast and adding gaussian noise
     d_img = degradate(o_img)
 
     #compute PSNR and SSIM of degradated image
-    PSNR_o[i-1] = round(cv2.PSNR(o_img, d_img),2)
-    SSIM_o[i-1] = SSIMcalc(o_img, d_img)
+    PSNR_do[i-1] = cv2.PSNR(o_img, d_img)
+    SSIM_do[i-1] = SSIMcalc(o_img, d_img)
+
 
 #LINEAR CONTRAST STRETCHING (only of d_img as requested)
-    lsc_img = linContrStr(o_img) 
-    PSNR_lsc[i-1] = round(cv2.PSNR(d_img, lsc_img),2)
-    SSIM_lsc[i-1] = SSIMcalc(d_img, lsc_img)
+    lsc_img = linContrStr(d_img) 
+    PSNR_lsc[i-1] = cv2.PSNR(o_img, lsc_img)
+    SSIM_lsc[i-1] = SSIMcalc(o_img, lsc_img)
 
 
 #HISTOGRAM EQUALIZATION
-    he_img = histEq(o_img)
-    PSNR_he[i-1] = round(cv2.PSNR(d_img, he_img),2)
-    SSIM_he[i-1] = SSIMcalc(d_img, he_img)
-
-    lsc_he_img = linContrStr(histEq(o_img))
-    PSNR_lsc_he[i-1] = round(cv2.PSNR(d_img, lsc_he_img),2)
-    SSIM_lsc_he[i-1] = SSIMcalc(d_img, lsc_he_img)
-
-    #concatenate in the same visualization original image, degradated image and enhanced image
-    name = str(i) + " - combo (sx original, cx degradated, dx lcs)" 
-    vis = np.concatenate((d_img, o_img, lsc_img, he_img, lsc_he_img), axis=1)
-    cv2.imshow(name, vis)
+    he_img = histEq(d_img)
+    PSNR_he[i-1] = cv2.PSNR(o_img, he_img)
+    SSIM_he[i-1] = SSIMcalc(o_img, he_img)
 
 
+
+#DENOISING + GAMMA CORRECTION
+    g_img =(linContrStr(gammaCorr(d_img)))
+    PSNR_g[i-1] = cv2.PSNR(o_img, g_img)
+    SSIM_g[i-1] = SSIMcalc(o_img, g_img)
+
+
+#VISUALIZATION
+    ehn_img = [lsc_img,he_img,g_img]
+    visualizeCombos(o_img,d_img,ehn_img,i)
+
+    PSNRTableSing = fillTableSing(PSNR_lsc[i-1], PSNR_he[i-1], PSNR_g[i-1],SSIM_lsc[i-1], SSIM_he[i-1], SSIM_g[i-1],i)
+    print("\n\n METRICS TABLE OF " +str(i)+" IMAGE")
+    print(PSNRTableSing)
+
+
+    print("\n\nPress any key to analyze next image")
+    cv2.waitKey(0) #wait for any key to close windows
+    cv2.destroyAllWindows() #destroy all the windows at the end of the program for have a safe memory
 
 
 #TABLE CONSTRUCTORS
-PSNRTable = fillTable(PSNR_o, PSNR_lsc, PSNR_he, PSNR_lsc_he)
 
+print("\n\nSummary table with metrics")
+
+PSNRTable = fillTable(PSNR_lsc, PSNR_he, PSNR_g)
 print("\n\nPSNR TABLE")
 print(PSNRTable)
 
 
+
 print("\n\nSSIM TABLE: 1 high similarity, 0 no similarity, negative means two different images")
-SSIMTable = fillTable(SSIM_o, SSIM_lsc, SSIM_he, SSIM_lsc_he)
+SSIMTable = fillTable(SSIM_lsc, SSIM_he, SSIM_g)
 print(SSIMTable)
 
 
