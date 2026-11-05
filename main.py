@@ -118,12 +118,14 @@ def gammaCorr(img):
 
     return res
 
+
+
 def visualizeCombos(img1, img2, arr_img_ehn, i):
-    rescale = 0.4 if (i == 1 or i == 2) else 0.14 #for better visualization, not affect metrics
+    rescale = 0.3 if (i == 1 or i == 2) else 0.10 #for better visualization, not affect metrics
     ehn_method = ["linear contrast stretching","histogram equalization","denosing + gamma correction"]
 
     for j in range(0,3):
-        name = "visual analysis of photo_" + str(i) + " with " + ehn_method[j] + " method"
+        name = "visual analysis of photo_" + str(i) + " with " + ehn_method[j]
         vis = np.concatenate(
                 (    
                 cv2.resize(img1, None, fx=rescale, fy=rescale, interpolation=cv2.INTER_AREA),  #original
@@ -133,19 +135,12 @@ def visualizeCombos(img1, img2, arr_img_ehn, i):
                 axis=1)
         
         cv2.imshow(name, vis)
-    
+        path = "output_img/photo_" + str(i) + " with " + ehn_method[j] +".jpg"
+        cv2.imwrite(path, vis)
     
 
 
 #default init
-# all data referred to degradated image vs
-#                                           o: original
-#                                           lsc: linear contrast stretching
-
-
-PSNR_do = [0,0,0,0]
-SSIM_do = [0,0,0,0]
-
 PSNR_lsc = [0,0,0,0]
 SSIM_lsc = [0,0,0,0]
 PSNR_he = [0,0,0,0]
@@ -165,12 +160,7 @@ for i in range (1,5):
     #degradate img reduncing contrast and adding gaussian noise
     d_img = degradate(o_img)
 
-    #compute PSNR and SSIM of degradated image
-    PSNR_do[i-1] = cv2.PSNR(o_img, d_img)
-    SSIM_do[i-1] = SSIMcalc(o_img, d_img)
-
-
-#LINEAR CONTRAST STRETCHING (only of d_img as requested)
+#LINEAR CONTRAST STRETCHING
     lsc_img = linContrStr(d_img) 
     PSNR_lsc[i-1] = cv2.PSNR(o_img, lsc_img)
     SSIM_lsc[i-1] = SSIMcalc(o_img, lsc_img)
@@ -194,7 +184,7 @@ for i in range (1,5):
     visualizeCombos(o_img,d_img,ehn_img,i)
 
     PSNRTableSing = fillTableSing(PSNR_lsc[i-1], PSNR_he[i-1], PSNR_g[i-1],SSIM_lsc[i-1], SSIM_he[i-1], SSIM_g[i-1],i)
-    print("\n\n METRICS TABLE OF photo_" +str(i))
+    print("\n\n\n\n\n\n\n METRICS TABLE OF photo_" +str(i))
     print(PSNRTableSing)
 
 
@@ -205,10 +195,10 @@ for i in range (1,5):
 
 #TABLE CONSTRUCTORS
 
-print("\n\nSummary table with metrics")
+print("\n\n\n\n\n\nSummary table with metrics")
 
 PSNRTable = fillTable(PSNR_lsc, PSNR_he, PSNR_g)
-print("\n\nPSNR TABLE")
+print("\nPSNR TABLE")
 print(PSNRTable)
 
 
@@ -217,3 +207,5 @@ print("\n\nSSIM TABLE: 1 high similarity, 0 no similarity, negative means two di
 SSIMTable = fillTable(SSIM_lsc, SSIM_he, SSIM_g)
 print(SSIMTable)
 
+
+print("All images seen during the execution are inside the folder output_img/")

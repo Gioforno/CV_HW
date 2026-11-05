@@ -12,5 +12,12 @@ To create and work inside the virtual environement for this project, is necessar
 ```bash
 python -m venv hw1env #create venv
 source hw1env/bin/activate #activate venv
-python -m pip install -r requirements.txt #install useful lib
+python -m pip install -r requirements.txt #install necessary lib
 ```
+
+## execution
+
+Run `python main.py` to start the execution
+
+All output image will be written on output_img/
+After the first execution, the photo will be overwritten due to having the same name: if you change some parameter and want to keep some previous processed image, change its name or bring outside the folder
