@@ -15,9 +15,8 @@ source hw1env/bin/activate #activate venv
 python -m pip install -r requirements.txt #install necessary lib
 ```
 
-## execution
+## real execution
 
 Run `python main.py` to start the execution
 
-All output image will be written on output_img/
-After the first execution, the photo will be overwritten due to having the same name: if you change some parameter and want to keep some previous processed image, change its name or bring outside the folder
+All output image will be written on `output_img/`. After the first execution, the photo will be overwritten due to having the same name: if you change some parameter and want to keep some previous processed image, change its name or bring outside the folder
