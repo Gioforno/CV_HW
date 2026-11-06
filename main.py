@@ -78,4 +78,4 @@ saveCsv(PSNR_lcs, PSNR_he, PSNR_g, SSIM_lcs, SSIM_he, SSIM_g)
 #SSIM TABLE: 1 high similarity, 0 no similarity, negative means two different images
 #PSNR higher is more similar
 
-print("\n\nAll images seen during the execution are inside the folder output/output_img/\n\nsummary of metrics are in output/metrics.csv\n\tfor SSIM, remeber that 1 means same images, 0 no similarity and negative values maens different images\n\tFor PSNR, higher values means more similar images\n")
+print("\n\nAll images seen during the execution are inside the folder output/output_img/\n\nsummary of metrics are in output/metrics.csv\n\tfor SSIM, 1 means same images, 0 no similarity and negative values means different images\n\tFor PSNR, higher values means more similar images\n")
