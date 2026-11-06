@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from table import *
-from visualize import visualizeCombos
+from visualize import *
 from metrics import *
 
 
@@ -20,8 +20,8 @@ def degradate(img):
 
 
 #default init
-PSNR_lsc = [0,0,0,0]
-SSIM_lsc = [0,0,0,0]
+PSNR_lcs = [0,0,0,0]
+SSIM_lcs = [0,0,0,0]
 PSNR_he = [0,0,0,0]
 SSIM_he = [0,0,0,0]
 PSNR_g = [0,0,0,0]
@@ -40,9 +40,9 @@ for i in range (1,5):
     d_img = degradate(o_img)
 
 #LINEAR CONTRAST STRETCHING
-    lsc_img = linContrStr(d_img) 
-    PSNR_lsc[i-1] = cv2.PSNR(o_img, lsc_img)
-    SSIM_lsc[i-1] = SSIMcalc(o_img, lsc_img)
+    lcs_img = linContrStr(d_img) 
+    PSNR_lcs[i-1] = cv2.PSNR(o_img, lcs_img)
+    SSIM_lcs[i-1] = SSIMcalc(o_img, lcs_img)
 
 
 #HISTOGRAM EQUALIZATION
@@ -59,30 +59,23 @@ for i in range (1,5):
 
 
 #VISUALIZATION
-    ehn_img = [lsc_img,he_img,g_img]
+    ehn_img = [lcs_img,he_img,g_img]
     visualizeCombos(o_img,d_img,ehn_img,i)
 
-    PSNRTableSing = fillTableSing(PSNR_lsc[i-1], PSNR_he[i-1], PSNR_g[i-1],SSIM_lsc[i-1], SSIM_he[i-1], SSIM_g[i-1],i)
-    print("\n\n\n\n\n\n\n METRICS TABLE OF photo_" +str(i))
+    PSNRTableSing = fillTableSing(PSNR_lcs[i-1], PSNR_he[i-1], PSNR_g[i-1],SSIM_lcs[i-1], SSIM_he[i-1], SSIM_g[i-1],i)
+    print("\n\n\n\n\nMETRICS TABLE OF photo_" +str(i) + ", press any key to analyze next image")
     print(PSNRTableSing)
 
 
-    print("\n\nPress any key to analyze next image")
     cv2.waitKey(0) #wait for any key to close windows
     cv2.destroyAllWindows() #destroy all the windows at the end of the program for have a safe memory
 
 
-#SUMMARY TABLE
-print("\n\n\n\n\n\nSummary table with metrics")
 
-PSNRTable = fillTable(PSNR_lsc, PSNR_he, PSNR_g)
-print("\nPSNR TABLE")
-print(PSNRTable)
+saveCsv(PSNR_lcs, PSNR_he, PSNR_g, SSIM_lcs, SSIM_he, SSIM_g)
 
 
-print("\n\nSSIM TABLE: 1 high similarity, 0 no similarity, negative means two different images")
-SSIMTable = fillTable(SSIM_lsc, SSIM_he, SSIM_g)
-print(SSIMTable)
+#SSIM TABLE: 1 high similarity, 0 no similarity, negative means two different images
+#PSNR higher is more similar
 
-
-print("All images seen during the execution are inside the folder output_img/")
+print("\n\nAll images seen during the execution are inside the folder output/output_img/\n\nsummary of metrics are in output/metrics.csv\n\tfor SSIM, remeber that 1 means same images, 0 no similarity and negative values maens different images\n\tFor PSNR, higher values means more similar images\n")
