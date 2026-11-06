@@ -15,8 +15,11 @@ source hw1env/bin/activate #activate venv
 python -m pip install -r requirements.txt #install necessary libraries
 ```
 
-## real execution
+## execution&output
 
 Run `python main.py` to start the execution.
 
-All output image will be written on `output_img/`. After the first execution, the output photos will be overwritten every exectuion: if you change some parameters and want to keep some previous processed images, change their name or bring them outside the `output_img/` folder.
+All the results of the implementation will be written inside `output/`:
+
+- metrics will be in `output/mtrics.csv`
+- images will be in `output/output_img/`. Please note that each execution overwrite images in this folder. if you want to keep some previous processed images before the execution change their name or bring it outside the folder
