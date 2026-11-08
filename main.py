@@ -3,7 +3,7 @@ import numpy as np
 from table import *
 from visualize import *
 from metrics import *
-
+from methods import *
 
 def degradate(img):
     alpha = 0.7
@@ -52,7 +52,7 @@ for i in range (1,5):
 
 
 
-#DENOISING + GAMMA CORRECTION
+#LINEAR CONTRAST STRETCHING + GAMMA CORRECTION
     g_img =(linContrStr(gammaCorr(d_img)))
     PSNR_g[i-1] = cv2.PSNR(o_img, g_img)
     SSIM_g[i-1] = SSIMcalc(o_img, g_img)
