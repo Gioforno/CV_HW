@@ -9,7 +9,7 @@ def degradate(img):
     alpha = 0.7
     beta = 30
     mean = 0
-    stddev = 50 
+    stddev = 60 
     noise = np.zeros(img.shape, np.uint8)
     cv2.randn(noise, mean, stddev)
     new_img = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
@@ -52,8 +52,8 @@ for i in range (1,5):
 
 
 
-#LINEAR CONTRAST STRETCHING + GAMMA CORRECTION
-    g_img =(linContrStr(gammaCorr(d_img)))
+#DENOISING + GAMMA CORRECTION
+    g_img =(gammaCorr(cv2.fastNlMeansDenoisingColored(d_img)))
     PSNR_g[i-1] = cv2.PSNR(o_img, g_img)
     SSIM_g[i-1] = SSIMcalc(o_img, g_img)
 

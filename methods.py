@@ -42,7 +42,7 @@ def histEq(img):
 
 def gammaCorr(img):
     ## [changing-contrast-brightness-gamma-correction]
-    gamma = 0.25
+    gamma = 1.25
     lookUpTable = np.empty((1,256), np.uint8)
     for i in range(256):
         lookUpTable[0,i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
